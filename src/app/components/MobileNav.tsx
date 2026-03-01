@@ -4,6 +4,7 @@ import {
   MessageSquare,
   Building2,
   Users,
+  ClipboardList,
   Menu,
   X,
   Settings,
@@ -20,6 +21,7 @@ const navItems = [
   { icon: MessageSquare, label: "Inbox", path: "/inbox", badge: 3 },
   { icon: Building2, label: "Properties", path: "/properties" },
   { icon: Users, label: "Team", path: "/team" },
+  { icon: ClipboardList, label: "Tasks", path: "/tasks" },
   { icon: Settings, label: "Settings", path: "/settings" },
   { icon: HelpCircle, label: "Help", path: "/help" },
 ];

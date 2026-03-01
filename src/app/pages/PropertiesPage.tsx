@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   MapPin, Bed, Bath, Users, Star, Globe, Plus, Search, X,
   CheckCircle2, ExternalLink, Edit3, Check, UserCircle,
+  Link2, Copy, Unlink, ChevronDown,
 } from "lucide-react";
 
 interface Cleaner {
@@ -388,31 +389,11 @@ export function PropertiesPage() {
                 </div>
               </div>
 
-              {/* Connected Channels */}
-              <div className="mb-6">
-                <h3 style={{ fontFamily: "Nunito, sans-serif", color: "#264653", fontSize: "0.9375rem", fontWeight: 700, marginBottom: "0.75rem" }}>
-                  Connected Channels
-                </h3>
-                <div className="space-y-2">
-                  {selectedProperty.channels.map((ch) => (
-                    <div key={ch.name} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: "#F8F9FA" }}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ch.color }} />
-                        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.8125rem", color: "#264653", fontWeight: 500 }}>{ch.name}</span>
-                      </div>
-                      <span className="px-2 py-0.5 rounded-md"
-                        style={{
-                          fontFamily: "Inter, sans-serif", fontSize: "0.625rem", fontWeight: 600,
-                          color: ch.connected ? "#2A9D8F" : "#2D343660",
-                          backgroundColor: ch.connected ? "#2A9D8F15" : "#F3F4F6",
-                        }}
-                      >
-                        {ch.connected ? "Connected" : "Disconnected"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Connected Channels / Platforms */}
+              <PlatformsSection
+                connectedChannels={selectedProperty.channels}
+                editing={editing}
+              />
 
               {/* Direct Booking */}
               <div className="mb-6">
@@ -466,6 +447,332 @@ export function PropertiesPage() {
             </div>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+interface PlatformsSectionProps {
+  connectedChannels: { name: string; color: string; connected: boolean }[];
+  editing: boolean;
+}
+
+function PlatformsSection({ connectedChannels, editing }: PlatformsSectionProps) {
+  // All available platforms
+  const allPlatforms = [
+    { name: "Airbnb", color: "#FF5A5F", connectionMethod: "api" as const, description: "Sync listings, calendars, and messages" },
+    { name: "Booking.com", color: "#003580", connectionMethod: "api" as const, description: "Sync availability and reservations" },
+    { name: "VRBO", color: "#3B5998", connectionMethod: "ical" as const, description: "Import calendar via iCal feed" },
+    { name: "Expedia", color: "#FFCC00", connectionMethod: "ical" as const, description: "Import calendar via iCal feed" },
+    { name: "TripAdvisor", color: "#00AF87", connectionMethod: "ical" as const, description: "Import calendar via iCal feed" },
+    { name: "Google Vacation Rentals", color: "#4285F4", connectionMethod: "ical" as const, description: "Import calendar via iCal feed" },
+    { name: "Houfy", color: "#FF6B35", connectionMethod: "ical" as const, description: "Import calendar via iCal feed" },
+    { name: "Other (iCal)", color: "#94A3B8", connectionMethod: "ical" as const, description: "Any platform with iCal export" },
+  ];
+
+  // Build a map from connectedChannels
+  const connectedMap = new Map(connectedChannels.map((ch) => [ch.name, ch]));
+
+  // Merge: all platforms with their connection status
+  const mergedPlatforms = allPlatforms.map((p) => {
+    const existing = connectedMap.get(p.name);
+    return {
+      ...p,
+      connected: existing?.connected ?? false,
+    };
+  });
+
+  const connectedCount = mergedPlatforms.filter((p) => p.connected).length;
+
+  const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null);
+  const [icalUrls, setIcalUrls] = useState<Record<string, string>>({});
+  const [justConnected, setJustConnected] = useState<Set<string>>(new Set());
+  const [justDisconnected, setJustDisconnected] = useState<Set<string>>(new Set());
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const handleConnect = (platformName: string) => {
+    setJustConnected((prev) => new Set(prev).add(platformName));
+    setJustDisconnected((prev) => { const n = new Set(prev); n.delete(platformName); return n; });
+    setExpandedPlatform(null);
+  };
+
+  const handleDisconnect = (platformName: string) => {
+    setJustDisconnected((prev) => new Set(prev).add(platformName));
+    setJustConnected((prev) => { const n = new Set(prev); n.delete(platformName); return n; });
+  };
+
+  const getEffectiveConnected = (p: { name: string; connected: boolean }) => {
+    if (justConnected.has(p.name)) return true;
+    if (justDisconnected.has(p.name)) return false;
+    return p.connected;
+  };
+
+  const handleCopyIcal = (platformName: string) => {
+    const outUrl = `https://calendar.oomsi.co/export/${platformName.toLowerCase().replace(/[^a-z0-9]/g, "-")}.ics`;
+    navigator.clipboard?.writeText(outUrl);
+    setCopied(platformName);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  // In view mode: show only connected. In edit mode: show all.
+  const visiblePlatforms = editing
+    ? mergedPlatforms
+    : mergedPlatforms.filter((p) => getEffectiveConnected(p));
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 style={{ fontFamily: "Nunito, sans-serif", color: "#264653", fontSize: "0.9375rem", fontWeight: 700 }}>
+          Connected Channels
+        </h3>
+        {!editing && (
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#2D3436", opacity: 0.4 }}>
+            {connectedCount + justConnected.size - justDisconnected.size} connected
+          </span>
+        )}
+        {editing && (
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#2A9D8F", fontWeight: 500 }}>
+            {allPlatforms.length} platforms available
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        {visiblePlatforms.map((platform) => {
+          const isConnected = getEffectiveConnected(platform);
+          const isExpanded = expandedPlatform === platform.name;
+
+          return (
+            <div
+              key={platform.name}
+              className="rounded-xl overflow-hidden transition-all"
+              style={{
+                backgroundColor: isExpanded ? "white" : "#F8F9FA",
+                border: isExpanded ? "1px solid #E5E7EB" : "1px solid transparent",
+                boxShadow: isExpanded ? "0 2px 8px rgba(38,70,83,0.08)" : "none",
+              }}
+            >
+              {/* Platform row */}
+              <div className="flex items-center justify-between p-3">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: platform.color + "15" }}
+                  >
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: platform.color }} />
+                  </div>
+                  <div>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.8125rem", color: "#264653", fontWeight: 500 }}>
+                      {platform.name}
+                    </span>
+                    {editing && !isConnected && (
+                      <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: "#2D3436", opacity: 0.35, marginTop: "0.0625rem" }}>
+                        {platform.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {isConnected ? (
+                    <>
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
+                        style={{
+                          fontFamily: "Inter, sans-serif", fontSize: "0.625rem", fontWeight: 600,
+                          color: "#2A9D8F", backgroundColor: "#2A9D8F15",
+                        }}
+                      >
+                        <CheckCircle2 size={10} />
+                        Connected
+                      </span>
+                      {editing && (
+                        <button
+                          onClick={() => handleDisconnect(platform.name)}
+                          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-red-50 transition-colors"
+                          style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: "#EF4444", fontWeight: 500 }}
+                        >
+                          <Unlink size={10} />
+                          Disconnect
+                        </button>
+                      )}
+                    </>
+                  ) : editing ? (
+                    <button
+                      onClick={() => setExpandedPlatform(isExpanded ? null : platform.name)}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all hover:opacity-90"
+                      style={{
+                        fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", fontWeight: 500,
+                        color: isExpanded ? "#264653" : "#2A9D8F",
+                        backgroundColor: isExpanded ? "#F3F4F6" : "#2A9D8F12",
+                        border: isExpanded ? "none" : "1px dashed #2A9D8F40",
+                      }}
+                    >
+                      {isExpanded ? (
+                        <>
+                          <X size={11} /> Cancel
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={12} /> Connect
+                        </>
+                      )}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Expanded connection widget */}
+              {isExpanded && editing && (
+                <div className="px-4 pb-4" style={{ borderTop: "1px solid #F3F4F6" }}>
+                  {platform.connectionMethod === "api" ? (
+                    /* API-based connection (Airbnb, Booking.com) */
+                    <div className="mt-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="w-5 h-5 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: "#2A9D8F15", fontFamily: "Inter, sans-serif", fontSize: "0.5rem", color: "#2A9D8F", fontWeight: 700 }}
+                          >
+                            1
+                          </span>
+                          <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#264653", fontWeight: 500 }}>
+                            Authorize via {platform.name}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleConnect(platform.name)}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white transition-all hover:opacity-90 mb-3"
+                        style={{ backgroundColor: platform.color, fontFamily: "Inter, sans-serif", fontSize: "0.8125rem", fontWeight: 500 }}
+                      >
+                        <ExternalLink size={14} />
+                        Connect with {platform.name}
+                      </button>
+                      <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: "#2D3436", opacity: 0.35, textAlign: "center" }}>
+                        You'll be redirected to {platform.name} to authorize access. Calendar, bookings, and messages will sync automatically.
+                      </p>
+
+                      {/* OR divider */}
+                      <div className="flex items-center gap-3 my-3">
+                        <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
+                        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: "#2D3436", opacity: 0.3, fontWeight: 500 }}>
+                          OR USE ICAL
+                        </span>
+                        <div className="flex-1 h-px" style={{ backgroundColor: "#E5E7EB" }} />
+                      </div>
+
+                      {/* iCal fallback */}
+                      <div>
+                        <label style={{ fontFamily: "Inter, sans-serif", fontSize: "0.625rem", color: "#2D3436", opacity: 0.45, fontWeight: 500 }}>
+                          Import: Paste {platform.name} iCal URL
+                        </label>
+                        <div className="flex gap-2 mt-1.5">
+                          <input
+                            type="url"
+                            placeholder={`https://${platform.name.toLowerCase().replace(/\./g, "")}.com/calendar/ical/...`}
+                            value={icalUrls[platform.name] || ""}
+                            onChange={(e) => setIcalUrls((prev) => ({ ...prev, [platform.name]: e.target.value }))}
+                            className="flex-1 px-3 py-2 rounded-lg"
+                            style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#264653", border: "1px solid #E5E7EB", outline: "none", backgroundColor: "#F8F9FA" }}
+                          />
+                          <button
+                            onClick={() => handleConnect(platform.name)}
+                            disabled={!icalUrls[platform.name]}
+                            className="px-3 py-2 rounded-lg text-white transition-all hover:opacity-90 shrink-0 disabled:opacity-40"
+                            style={{ backgroundColor: "#2A9D8F", fontFamily: "Inter, sans-serif", fontSize: "0.75rem", fontWeight: 500 }}
+                          >
+                            Import
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Export iCal */}
+                      <div className="mt-3">
+                        <label style={{ fontFamily: "Inter, sans-serif", fontSize: "0.625rem", color: "#2D3436", opacity: 0.45, fontWeight: 500 }}>
+                          Export: Your oomsi iCal URL (paste into {platform.name})
+                        </label>
+                        <div className="flex items-center gap-2 mt-1.5 p-2 rounded-lg" style={{ backgroundColor: "#F8F9FA", border: "1px solid #E5E7EB" }}>
+                          <Link2 size={12} style={{ color: "#2D3436", opacity: 0.3, flexShrink: 0 }} />
+                          <span className="flex-1 truncate" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#264653", opacity: 0.6 }}>
+                            https://calendar.oomsi.co/export/{platform.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}.ics
+                          </span>
+                          <button
+                            onClick={() => handleCopyIcal(platform.name)}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-200 transition-colors shrink-0"
+                            style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: copied === platform.name ? "#2A9D8F" : "#264653", fontWeight: 500 }}
+                          >
+                            {copied === platform.name ? <Check size={10} /> : <Copy size={10} />}
+                            {copied === platform.name ? "Copied" : "Copy"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* iCal-only connection */
+                    <div className="mt-3">
+                      {/* Import */}
+                      <div className="mb-3">
+                        <label style={{ fontFamily: "Inter, sans-serif", fontSize: "0.625rem", color: "#2D3436", opacity: 0.45, fontWeight: 500 }}>
+                          Import: Paste {platform.name} iCal URL
+                        </label>
+                        <div className="flex gap-2 mt-1.5">
+                          <input
+                            type="url"
+                            placeholder={`https://www.${platform.name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com/calendar/ical/...`}
+                            value={icalUrls[platform.name] || ""}
+                            onChange={(e) => setIcalUrls((prev) => ({ ...prev, [platform.name]: e.target.value }))}
+                            className="flex-1 px-3 py-2 rounded-lg"
+                            style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#264653", border: "1px solid #E5E7EB", outline: "none", backgroundColor: "#F8F9FA" }}
+                          />
+                          <button
+                            onClick={() => handleConnect(platform.name)}
+                            disabled={!icalUrls[platform.name]}
+                            className="px-3 py-2 rounded-lg text-white transition-all hover:opacity-90 shrink-0 disabled:opacity-40"
+                            style={{ backgroundColor: "#2A9D8F", fontFamily: "Inter, sans-serif", fontSize: "0.75rem", fontWeight: 500 }}
+                          >
+                            Import
+                          </button>
+                        </div>
+                        <p className="mt-1.5" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: "#2D3436", opacity: 0.3 }}>
+                          Find this in {platform.name} under Calendar Settings &gt; Export / iCal link
+                        </p>
+                      </div>
+
+                      {/* Export */}
+                      <div>
+                        <label style={{ fontFamily: "Inter, sans-serif", fontSize: "0.625rem", color: "#2D3436", opacity: 0.45, fontWeight: 500 }}>
+                          Export: Your oomsi iCal URL (paste into {platform.name})
+                        </label>
+                        <div className="flex items-center gap-2 mt-1.5 p-2 rounded-lg" style={{ backgroundColor: "#F8F9FA", border: "1px solid #E5E7EB" }}>
+                          <Link2 size={12} style={{ color: "#2D3436", opacity: 0.3, flexShrink: 0 }} />
+                          <span className="flex-1 truncate" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#264653", opacity: 0.6 }}>
+                            https://calendar.oomsi.co/export/{platform.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}.ics
+                          </span>
+                          <button
+                            onClick={() => handleCopyIcal(platform.name)}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-200 transition-colors shrink-0"
+                            style={{ fontFamily: "Inter, sans-serif", fontSize: "0.5625rem", color: copied === platform.name ? "#2A9D8F" : "#264653", fontWeight: 500 }}
+                          >
+                            {copied === platform.name ? <Check size={10} /> : <Copy size={10} />}
+                            {copied === platform.name ? "Copied" : "Copy"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Hint when not in edit mode */}
+      {!editing && visiblePlatforms.length < allPlatforms.length && (
+        <p className="mt-2" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.625rem", color: "#2D3436", opacity: 0.3 }}>
+          Click "Edit" to connect more platforms ({allPlatforms.length - visiblePlatforms.length} available)
+        </p>
       )}
     </div>
   );
