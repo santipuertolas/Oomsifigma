@@ -12,14 +12,33 @@ Returning users go through **Login (`/login`)** > **Dashboard (`/dashboard`)**
 
 ## Landing Page (`/`)
 
-Single-page marketing site with anchor-scrolling sections: Hero, Platform Bar, Features (9-card grid), How It Works (4 steps), Pricing, Competitor Comparison, Testimonials, FAQ (accordion), Contact Us, and a Final CTA. Sticky nav with mobile hamburger menu.
+Single-page marketing site with anchor-scrolling sections. Sticky nav with mobile hamburger menu. Sections flow top-to-bottom:
 
-Key things to know:
+1. **Sticky Navigation** -- Logo, section links, "Sign In" text link + "Start 14-Day Free Trial" filled teal button
+2. **Hero** -- Two-column layout. Left: headline ("Every property has untapped potential. Oomsi unlocks it."), subheadline, "Start Your Free Trial" CTA + "See How It Works" secondary CTA, stats strip (15 min setup, 3 platforms, 24/7 WhatsApp). Right: oceanfront vacation property lifestyle image with floating metric widgets (92% occupancy, $34.2k revenue +18%).
+3. **Social Proof Strip** -- Rotating testimonial quote with customer name/location, auto-cycles every 5 seconds
+4. **Platform Integration Logos** -- Airbnb, Booking.com, VRBO, WhatsApp, Google (text-based logos, grayscale)
+5. **Value Proposition Pillars** -- 3 columns: Earn More (BarChart icon), Work Less (Clock icon), Grow Faster (TrendingUp icon)
+6. **Features Grid** -- 8 cards (2x4 on desktop) with benefit-oriented headlines (e.g., "All your properties, one view." not "Multi-Property Dashboard"). No "Coming Soon" cards.
+7. **How It Works** -- 4 steps in alternating left/right layout with actual Oomsi product screenshots (Add Property, Connect Channels, Invite Team, Dashboard). CTA button at end of section.
+8. **Pricing** -- Monthly/annual toggle (default: monthly). Three per-property tiers:
+   - **Starter**: $18/property/mo, up to 3 properties, "Start 14-Day Free Trial" CTA
+   - **Professional**: $14/property/mo, up to 20 properties, highlighted as "Most Popular", "Start 14-Day Free Trial" CTA
+   - **Enterprise**: $12/property/mo, 20+ properties, "Contact Sales" CTA scrolls to #contact
+   - Annual toggle shows strikethrough on monthly price + equivalent monthly price ($15/$11.67/$10) with "Save 17%" badge
+   - Followed by "How we compare" table (oomsi vs Industry Average)
+9. **Testimonials** -- 3 cards (Marco Rossi, Sarah Chen, David Muller) with 5-star ratings, quotes, photos, and "Read their story" links
+10. **FAQ** -- 7 accordion items including "Is there a free trial?" and "Do you charge booking fees?"
+11. **Contact** -- Form (name, email, subject dropdown, message) + hello@oomsi.com. Form currently just fires `window.alert`.
+12. **Final CTA** -- Dark teal block with "Ready to unlock your property's full potential?" headline. "Start Your Free Trial" + "View Pricing" links.
+13. **Footer** -- Mission: "Helping property owners unlock the full earning potential of their properties." Four columns: Product, Company, Resources (includes Blog), Legal.
 
-- **Pricing tiers are Starter ($5/property/mo), Professional ($9.90/property/mo), and Enterprise ($7.90/property/mo).** Starter and Professional CTAs both say "Start 14-Day Free Trial" and navigate to `/signup`. Enterprise CTA says "Contact Sales" and scrolls to the `#contact` section instead.
-- **Contact section** has a form (name, email, subject dropdown, message) and displays `hello@oomsi.com`. The form currently just fires a `window.alert` on submit -- needs to be wired to an actual endpoint.
-- **Footer links** for Product/Company/Resources scroll to the relevant anchor on the page. Legal links (Privacy Policy, Terms of Service, Cookie Policy, GDPR) navigate to their own routes.
-- No "free tier" exists. All references to free plans have been removed. The only "free" language is about the 14-day trial.
+Key design decisions:
+- **CTA consistency**: "Start 14-Day Free Trial" is the primary CTA on pricing cards and nav. Hero and final CTA use "Start Your Free Trial".
+- **No "Coming Soon" features** shown in the features grid (Enterprise pricing card does list "Guest check-in (coming soon)")
+- **Per-property pricing** -- not flat monthly
+- **Lifestyle images** in the hero (oceanfront property). Product screenshots in How It Works section.
+- **Tighter section spacing** compared to original version (~30% reduction in vertical padding)
 
 ## Legal Pages (`/privacy`, `/terms`, `/cookies`, `/gdpr`)
 
@@ -46,6 +65,9 @@ Simple email/password form. No real auth -- any submission navigates to `/dashbo
 3. **Onboarding data persistence** -- wizard collects property/channel/team data but doesn't save it anywhere
 4. **Legal copy review** -- content is placeholder, needs legal sign-off before going live
 5. **Trial logic** -- the 14-day trial is only a label right now, no billing or expiration logic exists
+6. **Platform logos** -- currently text-based, should be replaced with actual brand logos (SVG/PNG)
+7. **"Read their story" links** -- testimonial cards link nowhere, need case study pages or removal
+8. **Social proof animation** -- currently a hard content swap, could benefit from a fade/slide transition
 
 ---
 
@@ -62,4 +84,6 @@ Simple email/password form. No real auth -- any submission navigates to `/dashbo
 | Nunito           | --        | Headings                     |
 | Inter            | --        | Body/UI                      |
 
-Motto: **"Property Management. Made Simple."** -- used consistently in the hero, footer, signup branding panel, and login page.
+Tagline: **"Every property has untapped potential. Oomsi unlocks it."** -- used in the hero section.
+
+Mission: **"Helping property owners unlock the full earning potential of their properties."** -- used in the footer.

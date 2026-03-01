@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   ArrowRight, Check, ChevronDown, ChevronRight,
-  Calendar, Home, MessageSquare, Users, Sparkles,
+  Calendar, Home, Users,
   Shield, Smartphone, Bell, Globe, Star,
-  Building2, ClipboardCheck, Zap, Camera, Menu, X,
-  Mail, Send,
+  ClipboardCheck, Menu, X,
+  Mail, Send, MessageSquare,
+  BarChart3, Clock, TrendingUp,
 } from "lucide-react";
+import howItWorksStep1 from "figma:asset/bb8e7085586ce16bf7aa9b47e1120469a9a60ec1.png";
+import howItWorksStep2 from "figma:asset/a8440c6907bc4ab2ffa8b3d49b213383406615a0.png";
+import howItWorksStep3 from "figma:asset/63d1dcb4dadbafb437854fc2c42657d18768320b.png";
+import howItWorksStep4 from "figma:asset/764beacfa6773665c2488e62145711850b220223.png";
 
 /* ─── Brand Tokens ─── */
 const C = {
@@ -24,12 +29,10 @@ const F = {
 };
 
 /* ─── Images ─── */
-const heroVilla = "https://images.unsplash.com/photo-1758192838598-a1de4da5dcaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjB2YWNhdGlvbiUyMHZpbGxhJTIwcG9vbCUyMHN1bnNldHxlbnwxfHx8fDE3NzIzNjQ0MDN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
-const beachApt = "https://images.unsplash.com/photo-1768568080838-99d3db4ec953?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBiZWFjaCUyMGFwYXJ0bWVudCUyMHJlbnRhbHxlbnwxfHx8fDE3NzIzNjQ0MDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
-const chaletImg = "https://images.unsplash.com/photo-1603039531759-1a1bbe4f9f94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwbW91bnRhaW4lMjBjaGFsZXQlMjBpbnRlcmlvciUyMGZpcmVwbGFjZXxlbnwxfHx8fDE3NzIzNjQ0MDV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const heroPropertyImg = "https://images.unsplash.com/photo-1758192838598-a1de4da5dcaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBvY2VhbmZyb250JTIwdmFjYXRpb24lMjB2aWxsYSUyMHBvb2wlMjBzdW5zZXR8ZW58MXx8fHwxNzcyMzkwNzMxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 const testimonial1 = "https://images.unsplash.com/photo-1723537742563-15c3d351dbf2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW4lMjBoZWFkc2hvdCUyMHBvcnRyYWl0JTIwYnVzaW5lc3N8ZW58MXx8fHwxNzcyMzY0NDA2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 const testimonial2 = "https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbiUyMGhlYWRzaG90JTIwcG9ydHJhaXQlMjBzbWlsaW5nfGVufDF8fHx8MTc3MjM2NDQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
-const cleanerImg = "https://images.unsplash.com/photo-1701651545983-c3b357a8387f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGNsZWFuaW5nJTIwc3RhZmYlMjBob3VzZWtlZXBlciUyMHNtaWxpbmd8ZW58MXx8fHwxNzcyMzY0NDA0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const testimonial3 = "https://images.unsplash.com/photo-1591023271640-6050fda73d8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnZXJtYW4lMjBidXNpbmVzc21hbiUyMHBvcnRyYWl0JTIwaGVhZHNob3QlMjBzbWlsaW5nfGVufDF8fHx8MTc3MjM4ODk1NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
 /* ─── Data ─── */
 
@@ -45,189 +48,277 @@ const heroStats = [
   { value: "15 min", label: "Setup time" },
   { value: "3", label: "Platforms supported" },
   { value: "24/7", label: "WhatsApp alerts" },
-  { value: "Simple", label: "By design" },
+];
+
+const valuePillars = [
+  {
+    icon: BarChart3,
+    title: "Earn More",
+    description: "Maximize occupancy and revenue with smart pricing tools and multi-channel distribution.",
+    color: C.green,
+  },
+  {
+    icon: Clock,
+    title: "Work Less",
+    description: "Automate messaging, reviews, and task management so you spend time on strategy, not admin.",
+    color: C.periwinkle,
+  },
+  {
+    icon: TrendingUp,
+    title: "Grow Faster",
+    description: "Scale from 1 property to 100+ with tools that grow with your portfolio.",
+    color: C.sand,
+  },
 ];
 
 const features = [
   {
     icon: Home,
-    title: "Multi-Property Dashboard",
-    description: "See all your properties in one place — occupancy, revenue, and today's tasks at a glance. No more switching between tabs.",
+    title: "All your properties, one view.",
+    description: "See occupancy, revenue, and today's tasks at a glance. No more switching between tabs.",
     color: C.green,
   },
   {
     icon: Calendar,
-    title: "Unified Calendar & Bookings",
-    description: "One calendar for all your properties with colour-coded booking sources, direct bookings, blocked dates, and no more double bookings.",
+    title: "One calendar. Zero double-bookings.",
+    description: "Color-coded booking sources, direct bookings, blocked dates, all in one unified calendar.",
     color: C.teal,
   },
   {
     icon: Globe,
-    title: "Multi-Platform Sync",
-    description: "Connect Airbnb, Booking.com, and VRBO. Your calendars, bookings, and rates stay in sync automatically — every hour, hands-free.",
+    title: "List everywhere, manage from one place.",
+    description: "Connect Airbnb, Booking.com, and VRBO. Calendars, bookings, and rates sync automatically every hour.",
     color: C.periwinkle,
   },
   {
     icon: ClipboardCheck,
-    title: "Cleaning & Operations",
+    title: "Cleaning on autopilot.",
     description: "A cleaning task is created automatically after every checkout. Your team uploads photos, you review them — all in one place.",
     color: C.sand,
   },
   {
     icon: Users,
-    title: "Team Management",
-    description: "Invite your cleaners and maintenance staff. Assign them to properties, track their work, and manage hourly rates effortlessly.",
+    title: "Your team, organized.",
+    description: "Invite cleaners and maintenance staff. Assign them to properties, track their work, and manage hourly rates effortlessly.",
     color: C.green,
   },
   {
     icon: Smartphone,
-    title: "Cleaner Portal",
-    description: "Your cleaning team gets their own mobile portal. They see their tasks, accept or decline, and upload photos — no app install needed.",
+    title: "Your cleaners' own portal.",
+    description: "Your cleaning team gets their own mobile portal. They see tasks, accept or decline, and upload photos — no app install needed.",
     color: C.teal,
   },
   {
     icon: Bell,
-    title: "WhatsApp Notifications",
+    title: "Never miss an update.",
     description: "Task assignments, morning briefings, day-before reminders, and urgent pre-checkin alerts — all delivered straight to WhatsApp.",
     color: C.periwinkle,
   },
   {
     icon: Shield,
-    title: "Secure & Simple",
-    description: "Your admin dashboard is separate from the cleaner portal. Invite-only access, so only your team can see your data.",
+    title: "Secure by design.",
+    description: "Admin dashboard is separate from the cleaner portal. Invite-only access, so only your team can see your data.",
     color: C.slate,
-  },
-  {
-    icon: Sparkles,
-    title: "Guest Check-in (Coming Soon)",
-    description: "Automatically send guests a digital check-in link. ID verification and tourist tax collection — all handled for you.",
-    color: C.sand,
   },
 ];
 
-const howItWorks = [
+const howItWorksData = [
   {
     step: "01",
     title: "Add Your Properties",
     description: "Import from Airbnb or add manually. Set up bedrooms, check-in times, WiFi info, and cleaning photo requirements in minutes.",
-    image: heroVilla,
+    image: howItWorksStep1,
   },
   {
     step: "02",
     title: "Connect Your Channels",
     description: "Link Airbnb, Booking.com, and VRBO in a few clicks. Your bookings, rates, and availability sync automatically every hour.",
-    image: beachApt,
+    image: howItWorksStep2,
   },
   {
     step: "03",
     title: "Build Your Team",
     description: "Invite your cleaners and maintenance staff by email. Assign them to properties with primary and backup roles.",
-    image: cleanerImg,
+    image: howItWorksStep3,
   },
   {
     step: "04",
     title: "Let It Run",
     description: "Sit back. Cleaning tasks are created after every checkout, your team gets WhatsApp notifications, and your calendar stays perfectly in sync.",
-    image: chaletImg,
+    image: howItWorksStep4,
   },
 ];
 
-const pricingPlans = [
-  {
-    name: "Starter",
-    price: "5",
-    period: "per property / month",
-    description: "Great for hosts just getting started",
-    properties: "Up to 3",
-    highlight: false,
-    features: [
-      "Multi-property dashboard",
-      "Unified calendar",
-      "1 channel connection",
-      "Basic cleaning task management",
-      "1 team member",
-      "Cleaner portal access",
-      "Email support",
-    ],
-    cta: "Start 14-Day Free Trial",
-  },
-  {
-    name: "Professional",
-    price: "9.90",
-    period: "per property / month",
-    description: "For hosts scaling their portfolio",
-    properties: "Up to 20",
-    highlight: true,
-    features: [
-      "Everything in Starter",
-      "Unlimited channel connections",
-      "WhatsApp notifications",
-      "Cleaning photo gallery",
-      "Unlimited team members",
-      "Unassigned task alerts",
-      "Booking widget for your website",
-      "Priority email & chat support",
-    ],
-    cta: "Start 14-Day Free Trial",
-  },
-  {
-    name: "Enterprise",
-    price: "7.90",
-    period: "per property / month",
-    description: "For property management companies",
-    properties: "20+ properties",
-    highlight: false,
-    features: [
-      "Everything in Professional",
-      "Volume discount pricing",
-      "Guest check-in (coming soon)",
-      "Custom integrations",
-      "Dedicated account manager",
-      "White-label option",
-      "Phone support",
-    ],
-    cta: "Contact Sales",
-  },
+const pricingPlans = {
+  monthly: [
+    {
+      name: "Starter",
+      price: "18",
+      period: "per property / month",
+      annualEquiv: "",
+      originalPrice: "",
+      description: "Great for hosts just getting started",
+      properties: "Up to 3",
+      highlight: false,
+      features: [
+        "Multi-property dashboard",
+        "Unified calendar",
+        "1 channel connection",
+        "Basic cleaning task management",
+        "1 team member",
+        "Cleaner portal access",
+        "Email support",
+      ],
+      cta: "Start 14-Day Free Trial",
+      ctaAction: "signup" as const,
+    },
+    {
+      name: "Professional",
+      price: "14",
+      period: "per property / month",
+      annualEquiv: "",
+      originalPrice: "",
+      description: "For hosts scaling their portfolio",
+      properties: "Up to 20",
+      highlight: true,
+      features: [
+        "Everything in Starter",
+        "Unlimited channel connections",
+        "WhatsApp notifications",
+        "Cleaning photo gallery",
+        "Unlimited team members",
+        "Unassigned task alerts",
+        "Booking widget for your website",
+        "Priority email & chat support",
+      ],
+      cta: "Start 14-Day Free Trial",
+      ctaAction: "signup" as const,
+    },
+    {
+      name: "Enterprise",
+      price: "12",
+      period: "per property / month",
+      annualEquiv: "",
+      originalPrice: "",
+      description: "For property management companies",
+      properties: "20+ properties",
+      highlight: false,
+      features: [
+        "Everything in Professional",
+        "Guest check-in (coming soon)",
+        "Custom integrations",
+        "Dedicated account manager",
+        "White-label option",
+        "Phone support",
+      ],
+      cta: "Contact Sales",
+      ctaAction: "contact" as const,
+    },
+  ],
+  annual: [
+    {
+      name: "Starter",
+      price: "15",
+      period: "per property / month",
+      annualEquiv: "$180/property/year",
+      originalPrice: "18",
+      description: "Great for hosts just getting started",
+      properties: "Up to 3",
+      highlight: false,
+      features: [
+        "Multi-property dashboard",
+        "Unified calendar",
+        "1 channel connection",
+        "Basic cleaning task management",
+        "1 team member",
+        "Cleaner portal access",
+        "Email support",
+      ],
+      cta: "Start 14-Day Free Trial",
+      ctaAction: "signup" as const,
+    },
+    {
+      name: "Professional",
+      price: "11.67",
+      period: "per property / month",
+      annualEquiv: "$140/property/year",
+      originalPrice: "14",
+      description: "For hosts scaling their portfolio",
+      properties: "Up to 20",
+      highlight: true,
+      features: [
+        "Everything in Starter",
+        "Unlimited channel connections",
+        "WhatsApp notifications",
+        "Cleaning photo gallery",
+        "Unlimited team members",
+        "Unassigned task alerts",
+        "Booking widget for your website",
+        "Priority email & chat support",
+      ],
+      cta: "Start 14-Day Free Trial",
+      ctaAction: "signup" as const,
+    },
+    {
+      name: "Enterprise",
+      price: "10",
+      period: "per property / month",
+      annualEquiv: "$120/property/year",
+      originalPrice: "12",
+      description: "For property management companies",
+      properties: "20+ properties",
+      highlight: false,
+      features: [
+        "Everything in Professional",
+        "Guest check-in (coming soon)",
+        "Custom integrations",
+        "Dedicated account manager",
+        "White-label option",
+        "Phone support",
+      ],
+      cta: "Contact Sales",
+      ctaAction: "contact" as const,
+    },
+  ],
+};
+
+const comparisonData = [
+  { feature: "Starting price", oomsi: "From $12/property", competitor: "From $27.51/property" },
+  { feature: "Channel connections", oomsi: "Unlimited (Pro)", competitor: "Limited by plan" },
+  { feature: "WhatsApp notifications", oomsi: "Included (Pro)", competitor: "Not available" },
+  { feature: "Cleaner portal", oomsi: "Included (all plans)", competitor: "Not available" },
+  { feature: "Cleaning photo gallery", oomsi: "Included (Pro)", competitor: "Not available" },
+  { feature: "Team members", oomsi: "Unlimited (Pro)", competitor: "Extra cost" },
 ];
 
 const testimonials = [
   {
     name: "Marco Rossi",
-    role: "12 properties · Lake Como, Italy",
+    role: "12 properties, Lake Como, Italy",
     image: testimonial1,
     quote: "We cut our cleaning coordination time by 70% in the first month. The WhatsApp automation alone is worth the subscription — our cleaners actually prefer it over the old group chat.",
     rating: 5,
   },
   {
     name: "Sarah Chen",
-    role: "8 properties · Bali, Indonesia",
+    role: "8 properties, Bali, Indonesia",
     image: testimonial2,
     quote: "Coming from Smoobu, the pricing was a no-brainer. But what really sold me was the cleaner portal — my team finally has a proper tool instead of scattered messages.",
     rating: 5,
   },
   {
-    name: "David Müller",
-    role: "25 properties · Costa del Sol, Spain",
-    image: testimonial1,
+    name: "David Muller",
+    role: "25 properties, Costa del Sol, Spain",
+    image: testimonial3,
     quote: "The unified calendar with colour-coded sources is exactly what I needed. No more double bookings, no more spreadsheets. oomsi just works.",
     rating: 5,
   },
 ];
 
-const comparisonData = [
-  { feature: "Starting price", oomsi: "From $5/property", competitor: "From €27.51/property" },
-  { feature: "Channel connections", oomsi: "Unlimited (Pro)", competitor: "Limited by plan" },
-  { feature: "WhatsApp notifications", oomsi: "Included (Pro)", competitor: "Not available" },
-  { feature: "Cleaner portal", oomsi: "Included (all plans)", competitor: "Not available" },
-  { feature: "Cleaning photo gallery", oomsi: "Included (Pro)", competitor: "Not available" },
-  { feature: "Team members", oomsi: "Unlimited (Pro)", competitor: "Extra cost" },
-  { feature: "Guest check-in", oomsi: "Coming soon", competitor: "Add-on" },
-];
-
 const footerLinks = {
   Product: ["Features", "Pricing", "Integrations"],
   Company: ["About", "Contact"],
-  Resources: ["Help Center", "Documentation"],
+  Resources: ["Help Center", "Documentation", "Blog"],
   Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR"],
 };
 
@@ -237,11 +328,26 @@ export function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const [socialProofIndex, setSocialProofIndex] = useState(0);
+
+  const socialProofQuotes = [
+    { quote: "We cut our cleaning coordination time by 70% in the first month.", name: "Marco Rossi", detail: "12 properties, Lake Como" },
+    { quote: "The cleaner portal gave my team a proper tool instead of scattered messages.", name: "Sarah Chen", detail: "8 properties, Bali" },
+    { quote: "No more double bookings, no more spreadsheets. oomsi just works.", name: "David Muller", detail: "25 properties, Costa del Sol" },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSocialProofIndex((prev) => (prev + 1) % socialProofQuotes.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [socialProofQuotes.length]);
 
   const faqs = [
     {
       q: "How does oomsi compare to other PMS tools?",
-      a: "oomsi gives you the same core features as the big players — calendar sync, channel management, team coordination — at a fraction of the price. Starting at just $5 per property. Plus, we include a dedicated cleaner portal and WhatsApp notifications that most competitors don't offer.",
+      a: "oomsi gives you the same core features as the big players — calendar sync, channel management, team coordination — at a fraction of the price. Plus, we include a dedicated cleaner portal and WhatsApp notifications that most competitors don't offer.",
     },
     {
       q: "Can I import my properties from Airbnb?",
@@ -253,11 +359,19 @@ export function LandingPage() {
     },
     {
       q: "Is there a contract or commitment?",
-      a: "No contracts. All plans are month-to-month and you can cancel anytime. Both Starter and Professional include a 14-day free trial so you can try everything risk-free.",
+      a: "No contracts. All plans are month-to-month and you can cancel anytime. Every plan includes a 14-day free trial so you can try everything risk-free.",
     },
     {
       q: "What booking platforms can I connect?",
       a: "We support Airbnb, Booking.com, and VRBO with full two-way sync. You can also connect any other platform using a simple iCal link for calendar syncing.",
+    },
+    {
+      q: "Is there a free trial?",
+      a: "Yes! Every plan comes with a 14-day free trial. No credit card required to start. You get full access to all the features in your chosen plan during the trial period.",
+    },
+    {
+      q: "Do you charge booking fees?",
+      a: "No. Never. Per-property pricing only — no booking fees, no hidden costs.",
     },
   ];
 
@@ -267,9 +381,11 @@ export function LandingPage() {
     el?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const activePlans = pricingPlans[billingCycle];
+
   return (
     <div style={{ backgroundColor: C.white }}>
-      {/* ═══ NAV ═══ */}
+      {/* NAV */}
       <nav
         className="sticky top-0 z-50"
         style={{ backgroundColor: "rgba(248,249,250,0.92)", backdropFilter: "blur(12px)" }}
@@ -283,7 +399,6 @@ export function LandingPage() {
               oomsi
             </button>
 
-            {/* Desktop links */}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((l) => (
                 <button
@@ -310,18 +425,16 @@ export function LandingPage() {
                 className="px-5 py-2 rounded-lg text-white transition-all hover:opacity-90"
                 style={{ backgroundColor: C.green, fontFamily: F.body, fontSize: "0.8125rem", fontWeight: 600 }}
               >
-                Try It Free
+                Start 14-Day Free Trial
               </button>
             </div>
 
-            {/* Mobile menu button */}
             <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X size={24} style={{ color: C.teal }} /> : <Menu size={24} style={{ color: C.teal }} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="md:hidden px-4 pb-4 space-y-2" style={{ backgroundColor: "rgba(248,249,250,0.98)" }}>
             {navLinks.map((l) => (
@@ -347,16 +460,15 @@ export function LandingPage() {
                 className="flex-1 py-2.5 rounded-lg text-white"
                 style={{ backgroundColor: C.green, fontFamily: F.body, fontSize: "0.8125rem", fontWeight: 600 }}
               >
-                Try It Free
+                Start Free Trial
               </button>
             </div>
           </div>
         )}
       </nav>
 
-      {/* ═══ HERO ═══ */}
+      {/* HERO */}
       <section className="relative overflow-hidden">
-        {/* Decorative elements */}
         <div
           className="absolute top-20 -right-32 w-96 h-96 rounded-full opacity-[0.04]"
           style={{ backgroundColor: C.green }}
@@ -366,20 +478,9 @@ export function LandingPage() {
           style={{ backgroundColor: C.periwinkle }}
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left — copy */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-12">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6"
-                style={{ backgroundColor: C.green + "12", border: `1px solid ${C.green}25` }}
-              >
-                <Sparkles size={12} style={{ color: C.green }} />
-                <span style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.green, fontWeight: 600 }}>
-                  The #1 affordable PMS for vacation rentals
-                </span>
-              </div>
-
               <h1
                 style={{
                   fontFamily: F.heading,
@@ -390,8 +491,8 @@ export function LandingPage() {
                   marginBottom: "1.25rem",
                 }}
               >
-                Property management.{" "}
-                <span style={{ color: C.green }}>Made simple.</span>
+                Every property has untapped potential.{" "}
+                <span style={{ color: C.green }}>Oomsi unlocks it.</span>
               </h1>
 
               <p
@@ -405,8 +506,7 @@ export function LandingPage() {
                   marginBottom: "2rem",
                 }}
               >
-                One dashboard for all your properties, calendars, cleaning teams, and guest messages.
-                Connect Airbnb, Booking.com & VRBO — automate everything else.
+                The all-in-one platform that helps property owners and managers earn more from every booking — with smarter tools, not more work.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
@@ -415,7 +515,7 @@ export function LandingPage() {
                   className="flex items-center gap-2 px-8 py-4 rounded-xl transition-all hover:opacity-90"
                   style={{ backgroundColor: C.green, color: "white", fontFamily: F.body, fontSize: "1rem", fontWeight: 600 }}
                 >
-                  Start Your 14-Day Trial
+                  Start Your Free Trial
                   <ArrowRight size={18} />
                 </button>
                 <button
@@ -434,8 +534,7 @@ export function LandingPage() {
                 </button>
               </div>
 
-              {/* Social proof stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {heroStats.map((s) => (
                   <div key={s.label}>
                     <p style={{ fontFamily: F.heading, fontSize: "1.375rem", color: C.teal, fontWeight: 700 }}>
@@ -452,9 +551,8 @@ export function LandingPage() {
             {/* Right — hero visual */}
             <div className="relative">
               <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 20px 60px rgba(38,70,83,0.12)" }}>
-                <img src={heroVilla} alt="Luxury vacation rental" className="w-full h-auto object-cover" />
+                <img src={heroPropertyImg} alt="Luxury oceanfront vacation rental" className="w-full h-auto object-cover" />
               </div>
-              {/* Floating card — occupancy */}
               <div
                 className="absolute -bottom-6 -left-4 sm:-left-8 bg-white rounded-xl p-4"
                 style={{ boxShadow: "0 8px 30px rgba(38,70,83,0.1)" }}
@@ -463,21 +561,41 @@ export function LandingPage() {
                 <p style={{ fontFamily: F.heading, fontSize: "1.5rem", color: C.green, fontWeight: 700 }}>92%</p>
                 <p style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.slate, opacity: 0.5 }}>Occupancy</p>
               </div>
-              {/* Floating card — revenue */}
               <div
                 className="absolute -top-4 -right-4 sm:-right-8 bg-white rounded-xl p-4"
                 style={{ boxShadow: "0 8px 30px rgba(38,70,83,0.1)" }}
               >
                 <p style={{ fontFamily: F.body, fontSize: "0.625rem", color: C.slate, opacity: 0.4 }}>Revenue</p>
                 <p style={{ fontFamily: F.heading, fontSize: "1.5rem", color: C.teal, fontWeight: 700 }}>$34.2k</p>
-                <p style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.green, fontWeight: 500 }}>↑ 18% vs last month</p>
+                <p style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.green, fontWeight: 500 }}>+18% vs last month</p>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Social Proof Strip */}
+        <div
+          className="py-5 border-t border-b border-gray-100"
+          style={{ backgroundColor: C.teal + "06" }}
+        >
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p
+              className="transition-opacity duration-500"
+              style={{ fontFamily: F.body, fontSize: "0.9375rem", color: C.slate, fontStyle: "italic", opacity: 0.6, lineHeight: 1.6 }}
+            >
+              "{socialProofQuotes[socialProofIndex].quote}"
+            </p>
+            <p style={{ fontFamily: F.body, fontSize: "0.75rem", color: C.green, fontWeight: 600, marginTop: "0.5rem" }}>
+              {socialProofQuotes[socialProofIndex].name}
+              <span style={{ color: C.slate, opacity: 0.4, fontWeight: 400 }}>
+                {" "} — {socialProofQuotes[socialProofIndex].detail}
+              </span>
+            </p>
+          </div>
+        </div>
+
         {/* Platform logos bar */}
-        <div className="border-t border-gray-100 py-8">
+        <div className="py-7">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-center mb-5" style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.slate, opacity: 0.3, fontWeight: 500, letterSpacing: "0.05em" }}>
               CONNECTS WITH YOUR FAVORITE PLATFORMS
@@ -502,10 +620,34 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FEATURES ═══ */}
-      <section id="features" className="py-20 sm:py-28">
+      {/* VALUE PROPOSITION PILLARS */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid sm:grid-cols-3 gap-8 sm:gap-10">
+            {valuePillars.map((p) => (
+              <div key={p.title} className="text-center">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: p.color + "12" }}
+                >
+                  <p.icon size={26} style={{ color: p.color }} />
+                </div>
+                <h3 style={{ fontFamily: F.heading, fontSize: "1.25rem", fontWeight: 700, color: C.teal, marginBottom: "0.5rem" }}>
+                  {p.title}
+                </h3>
+                <p style={{ fontFamily: F.body, fontSize: "0.875rem", color: C.slate, opacity: 0.55, lineHeight: 1.7 }}>
+                  {p.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section id="features" className="py-14 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span
               className="inline-block px-3 py-1 rounded-full mb-4"
               style={{ backgroundColor: C.periwinkle + "15", fontFamily: F.body, fontSize: "0.6875rem", color: C.periwinkle, fontWeight: 600 }}
@@ -528,7 +670,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {features.map((f) => (
               <div
                 key={f.title}
@@ -553,10 +695,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section id="how-it-works" className="py-20 sm:py-28" style={{ backgroundColor: "white" }}>
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" className="py-14 sm:py-20" style={{ backgroundColor: "white" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span
               className="inline-block px-3 py-1 rounded-full mb-4"
               style={{ backgroundColor: C.green + "15", fontFamily: F.body, fontSize: "0.6875rem", color: C.green, fontWeight: 600 }}
@@ -579,11 +721,11 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="space-y-16 lg:space-y-24">
-            {howItWorks.map((step, i) => (
+          <div className="space-y-12 lg:space-y-20">
+            {howItWorksData.map((step, i) => (
               <div
                 key={step.step}
-                className={`grid lg:grid-cols-2 gap-10 lg:gap-16 items-center ${i % 2 === 1 ? "lg:direction-rtl" : ""}`}
+                className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center"
               >
                 <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                   <span
@@ -609,19 +751,31 @@ export function LandingPage() {
                 </div>
                 <div className={i % 2 === 1 ? "lg:order-1" : ""}>
                   <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 30px rgba(38,70,83,0.08)" }}>
-                    <img src={step.image} alt={step.title} className="w-full h-64 sm:h-80 object-cover" />
+                    <img src={step.image} alt={step.title} className="w-full h-auto object-cover" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* CTA after How It Works */}
+          <div className="text-center mt-14">
+            <button
+              onClick={() => navigate("/signup")}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl transition-all hover:opacity-90"
+              style={{ backgroundColor: C.green, color: "white", fontFamily: F.body, fontSize: "1rem", fontWeight: 600 }}
+            >
+              Ready to try it? Start your free trial
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-20 sm:py-28">
+      {/* PRICING */}
+      <section id="pricing" className="py-14 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <span
               className="inline-block px-3 py-1 rounded-full mb-4"
               style={{ backgroundColor: C.sand + "20", fontFamily: F.body, fontSize: "0.6875rem", color: "#B8860B", fontWeight: 600 }}
@@ -642,10 +796,54 @@ export function LandingPage() {
             <p style={{ fontFamily: F.body, fontSize: "1rem", color: C.slate, opacity: 0.5, maxWidth: "520px", margin: "0 auto" }}>
               Plans for every size. No hidden fees, no contracts, cancel anytime.
             </p>
+
+            {/* Billing toggle */}
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <button
+                onClick={() => setBillingCycle("monthly")}
+                className="px-4 py-2 rounded-lg transition-all"
+                style={{
+                  fontFamily: F.body,
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  backgroundColor: billingCycle === "monthly" ? C.green : "transparent",
+                  color: billingCycle === "monthly" ? "white" : C.slate,
+                  opacity: billingCycle === "monthly" ? 1 : 0.5,
+                }}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingCycle("annual")}
+                className="px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                style={{
+                  fontFamily: F.body,
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  backgroundColor: billingCycle === "annual" ? C.green : "transparent",
+                  color: billingCycle === "annual" ? "white" : C.slate,
+                  opacity: billingCycle === "annual" ? 1 : 0.5,
+                }}
+              >
+                Annual
+                <span
+                  className="px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: billingCycle === "annual" ? "rgba(255,255,255,0.2)" : C.green + "15",
+                    fontFamily: F.body,
+                    fontSize: "0.625rem",
+                    fontWeight: 700,
+                    color: billingCycle === "annual" ? "white" : C.green,
+                  }}
+                >
+                  Save 17%
+                </span>
+              </button>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {pricingPlans.map((plan) => (
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {activePlans.map((plan) => (
               <div
                 key={plan.name}
                 className="relative bg-white rounded-2xl p-6 sm:p-7 flex flex-col"
@@ -671,6 +869,11 @@ export function LandingPage() {
                 </p>
 
                 <div className="flex items-baseline gap-1 mb-1">
+                  {plan.originalPrice && (
+                    <span style={{ fontFamily: F.heading, fontSize: "1.25rem", fontWeight: 700, color: C.slate, opacity: 0.3, textDecoration: "line-through", marginRight: "0.25rem" }}>
+                      ${plan.originalPrice}
+                    </span>
+                  )}
                   <span style={{ fontFamily: F.heading, fontSize: "2.5rem", fontWeight: 800, color: C.teal }}>
                     ${plan.price}
                   </span>
@@ -678,8 +881,14 @@ export function LandingPage() {
                     / {plan.period}
                   </span>
                 </div>
+                {plan.annualEquiv && (
+                  <p style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.green, fontWeight: 500, marginBottom: "0.25rem" }}>
+                    {plan.annualEquiv}
+                  </p>
+                )}
                 <div
-                  className="px-3 py-1.5 rounded-lg mt-3 mb-5 inline-block"
+                  className="px-3 py-1.5 rounded-lg mt-2 mb-5 inline-block"
+                  style={{ backgroundColor: C.green + "08", fontFamily: F.body, fontSize: "0.75rem", color: C.teal, fontWeight: 500 }}
                 >
                   {plan.properties} properties
                 </div>
@@ -696,7 +905,7 @@ export function LandingPage() {
                 </ul>
 
                 <button
-                  onClick={() => plan.cta === "Contact Sales" ? scrollTo("#contact") : navigate("/signup")}
+                  onClick={() => plan.ctaAction === "contact" ? scrollTo("#contact") : navigate("/signup")}
                   className="w-full py-3 rounded-xl transition-all hover:opacity-90"
                   style={{
                     backgroundColor: plan.highlight ? C.green : "transparent",
@@ -714,18 +923,18 @@ export function LandingPage() {
           </div>
 
           {/* Competitor comparison */}
-          <div className="max-w-3xl mx-auto mt-16">
+          <div className="max-w-3xl mx-auto mt-14">
             <h3
               className="text-center mb-6"
               style={{ fontFamily: F.heading, fontSize: "1.25rem", fontWeight: 700, color: C.teal }}
             >
-              How we compare to the leading PMS
+              How we compare
             </h3>
             <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: "0 1px 3px rgba(38,70,83,0.05)" }}>
               <div className="grid grid-cols-3 px-5 py-3 border-b border-gray-50">
                 <span style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.slate, opacity: 0.35, fontWeight: 500 }}>Feature</span>
                 <span className="text-center" style={{ fontFamily: F.heading, fontSize: "0.8125rem", color: C.green, fontWeight: 700 }}>oomsi</span>
-                <span className="text-center" style={{ fontFamily: F.body, fontSize: "0.8125rem", color: C.slate, opacity: 0.35, fontWeight: 500 }}>Leading PMS</span>
+                <span className="text-center" style={{ fontFamily: F.body, fontSize: "0.8125rem", color: C.slate, opacity: 0.35, fontWeight: 500 }}>Industry Average</span>
               </div>
               {comparisonData.map((row, i) => (
                 <div key={row.feature} className="grid grid-cols-3 px-5 py-3" style={{ backgroundColor: i % 2 === 0 ? "#F8F9FA" : "white" }}>
@@ -739,10 +948,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ TESTIMONIALS ═══ */}
-      <section id="testimonials" className="py-20 sm:py-28" style={{ backgroundColor: "white" }}>
+      {/* TESTIMONIALS */}
+      <section id="testimonials" className="py-14 sm:py-20" style={{ backgroundColor: "white" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span
               className="inline-block px-3 py-1 rounded-full mb-4"
               style={{ backgroundColor: C.sand + "20", fontFamily: F.body, fontSize: "0.6875rem", color: "#B8860B", fontWeight: 600 }}
@@ -780,23 +989,30 @@ export function LandingPage() {
                 >
                   "{t.quote}"
                 </p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-3">
                   <img src={t.image} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
                   <div>
                     <p style={{ fontFamily: F.body, fontSize: "0.8125rem", color: C.teal, fontWeight: 600 }}>{t.name}</p>
                     <p style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.slate, opacity: 0.4 }}>{t.role}</p>
                   </div>
                 </div>
+                <button
+                  className="flex items-center gap-1 transition-opacity hover:opacity-70"
+                  style={{ fontFamily: F.body, fontSize: "0.75rem", color: C.green, fontWeight: 500 }}
+                >
+                  Read their story
+                  <ArrowRight size={12} />
+                </button>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══ FAQ ═══ */}
-      <section className="py-20 sm:py-28">
+      {/* FAQ */}
+      <section className="py-14 sm:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2
               style={{
                 fontFamily: F.heading,
@@ -842,11 +1058,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ CONTACT ═══ */}
-      <section id="contact" className="py-20 sm:py-28" style={{ backgroundColor: "white" }}>
+      {/* CONTACT */}
+      <section id="contact" className="py-14 sm:py-20" style={{ backgroundColor: "white" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            {/* Left — info */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
             <div>
               <span
                 className="inline-block px-3 py-1 rounded-full mb-4"
@@ -905,7 +1120,6 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* Right — contact form */}
             <div
               className="bg-white rounded-2xl p-6 sm:p-8"
               style={{ boxShadow: "0 2px 12px rgba(38,70,83,0.06)", border: "1px solid #F3F4F6" }}
@@ -989,8 +1203,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FINAL CTA ═══ */}
-      <section className="py-20 sm:py-28">
+      {/* FINAL CTA */}
+      <section className="py-14 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div
             className="rounded-3xl p-10 sm:p-16"
@@ -1006,12 +1220,12 @@ export function LandingPage() {
                 marginBottom: "1rem",
               }}
             >
-              Ready to manage your rentals<br />with peace of mind?
+              Ready to unlock your property's<br />full potential?
             </h2>
             <p
               style={{ fontFamily: F.body, fontSize: "1rem", color: "white", opacity: 0.6, maxWidth: "480px", margin: "0 auto 2rem" }}
             >
-              Property management doesn't have to be complicated. Start your 14-day trial — no credit card required.
+              Start your 14-day trial — no credit card required.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
@@ -1019,11 +1233,11 @@ export function LandingPage() {
                 className="flex items-center gap-2 px-8 py-4 rounded-xl transition-all hover:opacity-90"
                 style={{ backgroundColor: C.green, color: "white", fontFamily: F.body, fontSize: "1rem", fontWeight: 600 }}
               >
-                Start Your 14-Day Trial
+                Start Your Free Trial
                 <ArrowRight size={18} />
               </button>
               <button
-                onClick={() => scrollTo("#how-it-works")}
+                onClick={() => scrollTo("#pricing")}
                 className="flex items-center gap-2 px-6 py-4 rounded-xl transition-all hover:bg-white/10"
                 style={{ color: "white", fontFamily: F.body, fontSize: "0.9375rem", fontWeight: 500, opacity: 0.7 }}
               >
@@ -1035,21 +1249,19 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="border-t border-gray-100 py-16">
+      {/* FOOTER */}
+      <footer className="border-t border-gray-100 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
-            {/* Brand */}
             <div className="lg:col-span-1">
               <h3 style={{ fontFamily: F.heading, fontSize: "1.375rem", fontWeight: 800, color: C.teal, marginBottom: "0.75rem" }}>
                 oomsi
               </h3>
               <p style={{ fontFamily: F.body, fontSize: "0.8125rem", color: C.slate, opacity: 0.4, lineHeight: 1.7 }}>
-                Property management. Made simple.
+                Helping property owners unlock the full earning potential of their properties.
               </p>
             </div>
 
-            {/* Links */}
             {Object.entries(footerLinks).map(([category, links]) => (
               <div key={category}>
                 <h4
@@ -1073,6 +1285,7 @@ export function LandingPage() {
                       "About": "#how-it-works",
                       "Help Center": "#contact",
                       "Documentation": "#features",
+                      "Blog": "#features",
                     };
                     return (
                       <li key={link}>
@@ -1096,7 +1309,7 @@ export function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-gray-100 gap-4">
             <p style={{ fontFamily: F.body, fontSize: "0.75rem", color: C.slate, opacity: 0.3 }}>
-              © 2026 oomsi. All rights reserved.
+              &copy; 2026 oomsi. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
               {["Twitter", "LinkedIn", "Instagram"].map((s) => (
