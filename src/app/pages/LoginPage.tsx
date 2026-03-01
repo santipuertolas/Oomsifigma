@@ -11,7 +11,7 @@ export function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (
@@ -29,7 +29,7 @@ export function LoginPage() {
             oomsi
           </h1>
           <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.9375rem", color: "#2D3436", opacity: 0.5, marginTop: "0.5rem" }}>
-            Zen Productivity for Vacation Rentals
+            Property Management. Made Simple.
           </p>
         </div>
 

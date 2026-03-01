@@ -16,17 +16,17 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: CalendarDays, label: "Calendar", path: "/calendar" },
-  { icon: MessageSquare, label: "Inbox", path: "/inbox", badge: 3 },
-  { icon: Building2, label: "Properties", path: "/properties" },
-  { icon: Users, label: "Team", path: "/team" },
-  { icon: ClipboardList, label: "Tasks", path: "/tasks" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: CalendarDays, label: "Calendar", path: "/dashboard/calendar" },
+  { icon: MessageSquare, label: "Inbox", path: "/dashboard/inbox", badge: 3 },
+  { icon: Building2, label: "Properties", path: "/dashboard/properties" },
+  { icon: Users, label: "Team", path: "/dashboard/team" },
+  { icon: ClipboardList, label: "Tasks", path: "/dashboard/tasks" },
 ];
 
 const bottomItems = [
-  { icon: Settings, label: "Settings", path: "/settings" },
-  { icon: HelpCircle, label: "Help", path: "/help" },
+  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+  { icon: HelpCircle, label: "Help", path: "/dashboard/help" },
 ];
 
 export function Sidebar() {
@@ -48,7 +48,7 @@ export function Sidebar() {
           <span
             className="tracking-tight text-white cursor-pointer"
             style={{ fontFamily: "Nunito, sans-serif", fontSize: "1.5rem", fontWeight: 800 }}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
           >
             oomsi
           </span>
@@ -57,7 +57,7 @@ export function Sidebar() {
           <span
             className="text-white mx-auto cursor-pointer"
             style={{ fontFamily: "Nunito, sans-serif", fontSize: "1.5rem", fontWeight: 800 }}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
           >
             o
           </span>
@@ -73,7 +73,7 @@ export function Sidebar() {
       {/* Nav items */}
       <nav className="flex-1 px-3 mt-2 space-y-1">
         {navItems.map((item) => {
-          const isActive = item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path);
+          const isActive = item.path === "/dashboard" ? location.pathname === "/dashboard" : location.pathname.startsWith(item.path);
           return (
             <button
               key={item.label}
@@ -157,7 +157,7 @@ export function Sidebar() {
             style={{ backgroundColor: "#1d3540", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}
           >
             <button
-              onClick={() => { navigate("/profile"); setProfileOpen(false); }}
+              onClick={() => { navigate("/dashboard/profile"); setProfileOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/8 transition-colors"
               style={{ fontFamily: "Inter, sans-serif", fontSize: "0.8125rem" }}
             >

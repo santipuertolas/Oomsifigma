@@ -143,7 +143,7 @@ export function NeedsAssignment() {
           </div>
         </div>
         <button
-          onClick={() => navigate("/tasks")}
+          onClick={() => navigate("/dashboard/tasks")}
           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
           style={{
             fontFamily: "Inter, sans-serif",

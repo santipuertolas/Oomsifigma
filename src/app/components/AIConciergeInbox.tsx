@@ -87,7 +87,7 @@ export function AIConciergeInbox() {
             color: "#2A9D8F",
             fontWeight: 500,
           }}
-          onClick={() => navigate("/inbox")}
+          onClick={() => navigate("/dashboard/inbox")}
         >
           View all
           <ChevronRight size={14} />

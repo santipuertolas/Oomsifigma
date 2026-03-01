@@ -16,14 +16,14 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: CalendarDays, label: "Calendar", path: "/calendar" },
-  { icon: MessageSquare, label: "Inbox", path: "/inbox", badge: 3 },
-  { icon: Building2, label: "Properties", path: "/properties" },
-  { icon: Users, label: "Team", path: "/team" },
-  { icon: ClipboardList, label: "Tasks", path: "/tasks" },
-  { icon: Settings, label: "Settings", path: "/settings" },
-  { icon: HelpCircle, label: "Help", path: "/help" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: CalendarDays, label: "Calendar", path: "/dashboard/calendar" },
+  { icon: MessageSquare, label: "Inbox", path: "/dashboard/inbox", badge: 3 },
+  { icon: Building2, label: "Properties", path: "/dashboard/properties" },
+  { icon: Users, label: "Team", path: "/dashboard/team" },
+  { icon: ClipboardList, label: "Tasks", path: "/dashboard/tasks" },
+  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+  { icon: HelpCircle, label: "Help", path: "/dashboard/help" },
 ];
 
 export function MobileNav() {
@@ -48,7 +48,7 @@ export function MobileNav() {
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-white cursor-pointer"
             style={{ backgroundColor: "#2A9D8F", fontSize: "0.5625rem", fontWeight: 600 }}
-            onClick={() => { navigate("/profile"); setOpen(false); }}
+            onClick={() => { navigate("/dashboard/profile"); setOpen(false); }}
           >
             SM
           </div>
@@ -65,7 +65,7 @@ export function MobileNav() {
         >
           <nav className="space-y-1">
             {navItems.map((item) => {
-              const isActive = item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path);
+              const isActive = item.path === "/dashboard" ? location.pathname === "/dashboard" : location.pathname.startsWith(item.path);
               return (
                 <button
                   key={item.label}
@@ -93,7 +93,7 @@ export function MobileNav() {
           </nav>
           <div className="border-t border-white/10 mt-4 pt-4 space-y-1">
             <button
-              onClick={() => { navigate("/profile"); setOpen(false); }}
+              onClick={() => { navigate("/dashboard/profile"); setOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:text-white hover:bg-white/8 transition-all"
               style={{ fontFamily: "Inter, sans-serif", fontSize: "0.9375rem" }}
             >
