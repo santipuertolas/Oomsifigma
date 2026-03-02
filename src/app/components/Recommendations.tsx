@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import {
   Lightbulb, TrendingUp, ArrowRight, Check,
   Home, Globe, Users, DollarSign, BarChart3,
   Megaphone, Link2, Zap, Shield, ChevronRight,
-  Clock, Flame, X,
+  Clock, Flame, X, ChevronDown, ChevronUp,
 } from "lucide-react";
 
 /* ─── Brand ─── */
@@ -39,7 +39,7 @@ interface Recommendation {
   icon: typeof Home;
   actionLabel: string;
   actionRoute: string;
-  priority: number; // lower = higher priority (computed from effort + uplift)
+  priority: number;
 }
 
 /* ─── Journey Stages ─── */
@@ -52,188 +52,99 @@ const stages: { key: Stage; label: string; description: string }[] = [
 ];
 
 /* ─── Mock Recommendations ─── */
-// Priority: lower number = show first. Based on (effort: easy=1, med=2, hard=3) - (uplift magnitude)
 
 const allRecommendations: Recommendation[] = [
   // GETTING STARTED
   {
-    id: "r1",
-    title: "Complete your property profiles",
+    id: "r1", title: "Complete your property profiles",
     description: "Add photos, amenities, check-in instructions, and WiFi details to all your properties. Complete profiles get 23% more bookings.",
-    revenueUplift: "+23%",
-    revenueDetail: "more bookings from complete listings",
-    effort: "easy",
-    effortTime: "10 min per property",
-    category: "setup",
-    stage: "getting-started",
-    status: "completed",
-    icon: Home,
-    actionLabel: "Review Properties",
-    actionRoute: "/dashboard/properties",
-    priority: 1,
+    revenueUplift: "+23%", revenueDetail: "more bookings from complete listings",
+    effort: "easy", effortTime: "10 min per property", category: "setup",
+    stage: "getting-started", status: "completed", icon: Home,
+    actionLabel: "Review Properties", actionRoute: "/dashboard/properties", priority: 1,
   },
   {
-    id: "r2",
-    title: "Invite your cleaning team",
+    id: "r2", title: "Invite your cleaning team",
     description: "Add at least 2 cleaners with primary and backup assignments. Properties with backup cleaners have 94% fewer missed turnovers.",
-    revenueUplift: "+8%",
-    revenueDetail: "fewer missed turnovers",
-    effort: "easy",
-    effortTime: "5 min",
-    category: "operations",
-    stage: "getting-started",
-    status: "completed",
-    icon: Users,
-    actionLabel: "Manage Team",
-    actionRoute: "/dashboard/team",
-    priority: 2,
+    revenueUplift: "+8%", revenueDetail: "fewer missed turnovers",
+    effort: "easy", effortTime: "5 min", category: "operations",
+    stage: "getting-started", status: "completed", icon: Users,
+    actionLabel: "Manage Team", actionRoute: "/dashboard/team", priority: 2,
   },
   {
-    id: "r3",
-    title: "Connect your first channel",
+    id: "r3", title: "Connect your first channel",
     description: "Link your Airbnb account to sync calendars, bookings, and rates automatically. This is the foundation of your multi-channel strategy.",
-    revenueUplift: "+12%",
-    revenueDetail: "revenue from calendar sync",
-    effort: "easy",
-    effortTime: "5 min",
-    category: "channels",
-    stage: "getting-started",
-    status: "completed",
-    icon: Link2,
-    actionLabel: "Connect Airbnb",
-    actionRoute: "/dashboard/properties",
-    priority: 3,
+    revenueUplift: "+12%", revenueDetail: "revenue from calendar sync",
+    effort: "easy", effortTime: "5 min", category: "channels",
+    stage: "getting-started", status: "completed", icon: Link2,
+    actionLabel: "Connect Airbnb", actionRoute: "/dashboard/properties", priority: 3,
   },
   // GROWING
   {
-    id: "r4",
-    title: "Add Booking.com as a channel",
+    id: "r4", title: "Add Booking.com as a channel",
     description: "Properties listed on both Airbnb and Booking.com see an average 35% increase in bookings. Oomsi keeps your calendars perfectly in sync.",
-    revenueUplift: "+35%",
-    revenueDetail: "more bookings from dual-channel listing",
-    effort: "easy",
-    effortTime: "15 min",
-    category: "channels",
-    stage: "growing",
-    status: "todo",
-    icon: Globe,
-    actionLabel: "Connect Booking.com",
-    actionRoute: "/dashboard/properties",
-    priority: 1,
+    revenueUplift: "+35%", revenueDetail: "more bookings from dual-channel listing",
+    effort: "easy", effortTime: "15 min", category: "channels",
+    stage: "growing", status: "todo", icon: Globe,
+    actionLabel: "Connect Booking.com", actionRoute: "/dashboard/properties", priority: 1,
   },
   {
-    id: "r5",
-    title: "Enable smart pricing suggestions",
+    id: "r5", title: "Enable smart pricing suggestions",
     description: "Turn on AI-powered pricing recommendations based on seasonality, local events, and competitor rates. Smart-priced properties earn 18-30% more.",
-    revenueUplift: "+30%",
-    revenueDetail: "average revenue increase",
-    effort: "easy",
-    effortTime: "2 min",
-    category: "pricing",
-    stage: "growing",
-    status: "todo",
-    icon: DollarSign,
-    actionLabel: "Enable Smart Pricing",
-    actionRoute: "/dashboard/settings",
-    priority: 2,
+    revenueUplift: "+30%", revenueDetail: "average revenue increase",
+    effort: "easy", effortTime: "2 min", category: "pricing",
+    stage: "growing", status: "todo", icon: DollarSign,
+    actionLabel: "Enable Smart Pricing", actionRoute: "/dashboard/settings", priority: 2,
   },
   {
-    id: "r6",
-    title: "Set up WhatsApp notifications",
+    id: "r6", title: "Set up WhatsApp notifications",
     description: "Your cleaning team responds 3x faster with WhatsApp alerts. Enable real-time task assignments, morning briefings, and pre-checkin reminders.",
-    revenueUplift: "+5%",
-    revenueDetail: "from faster turnovers",
-    effort: "easy",
-    effortTime: "5 min",
-    category: "operations",
-    stage: "growing",
-    status: "in-progress",
-    icon: Zap,
-    actionLabel: "Set Up WhatsApp",
-    actionRoute: "/dashboard/settings",
-    priority: 3,
+    revenueUplift: "+5%", revenueDetail: "from faster turnovers",
+    effort: "easy", effortTime: "5 min", category: "operations",
+    stage: "growing", status: "in-progress", icon: Zap,
+    actionLabel: "Set Up WhatsApp", actionRoute: "/dashboard/settings", priority: 3,
   },
   {
-    id: "r7",
-    title: "Add VRBO to your channels",
+    id: "r7", title: "Add VRBO to your channels",
     description: "Triple your channel exposure by adding VRBO. Combined multi-channel listings increase occupancy by 20% on average.",
-    revenueUplift: "+20%",
-    revenueDetail: "occupancy increase",
-    effort: "medium",
-    effortTime: "20 min",
-    category: "channels",
-    stage: "growing",
-    status: "todo",
-    icon: Globe,
-    actionLabel: "Connect VRBO",
-    actionRoute: "/dashboard/properties",
-    priority: 4,
+    revenueUplift: "+20%", revenueDetail: "occupancy increase",
+    effort: "medium", effortTime: "20 min", category: "channels",
+    stage: "growing", status: "todo", icon: Globe,
+    actionLabel: "Connect VRBO", actionRoute: "/dashboard/properties", priority: 4,
   },
   // OPTIMIZING
   {
-    id: "r8",
-    title: "Launch your direct booking website",
+    id: "r8", title: "Launch your direct booking website",
     description: "Stop paying 15-20% in OTA commissions. Create a branded booking website with our widget and start accepting direct bookings.",
-    revenueUplift: "+15-20%",
-    revenueDetail: "saved on commission fees",
-    effort: "medium",
-    effortTime: "30 min",
-    category: "growth",
-    stage: "optimizing",
-    status: "todo",
-    icon: Megaphone,
-    actionLabel: "Create Booking Website",
-    actionRoute: "/dashboard/settings",
-    priority: 5,
+    revenueUplift: "+15-20%", revenueDetail: "saved on commission fees",
+    effort: "medium", effortTime: "30 min", category: "growth",
+    stage: "optimizing", status: "todo", icon: Megaphone,
+    actionLabel: "Create Booking Website", actionRoute: "/dashboard/settings", priority: 5,
   },
   {
-    id: "r9",
-    title: "Review your pricing strategy",
+    id: "r9", title: "Review your pricing strategy",
     description: "Your weekend rates are 12% below market average. Adjusting pricing for weekends and peak seasons could add $2,400/year per property.",
-    revenueUplift: "+$2.4k",
-    revenueDetail: "per property per year",
-    effort: "medium",
-    effortTime: "15 min",
-    category: "pricing",
-    stage: "optimizing",
-    status: "todo",
-    icon: BarChart3,
-    actionLabel: "Review Pricing",
-    actionRoute: "/dashboard/properties",
-    priority: 6,
+    revenueUplift: "+$2.4k", revenueDetail: "per property per year",
+    effort: "medium", effortTime: "15 min", category: "pricing",
+    stage: "optimizing", status: "todo", icon: BarChart3,
+    actionLabel: "Review Pricing", actionRoute: "/dashboard/properties", priority: 6,
   },
   {
-    id: "r10",
-    title: "Set up cleaning photo requirements",
+    id: "r10", title: "Set up cleaning photo requirements",
     description: "Require photo verification after every clean. Properties with photo checklists have 60% fewer guest complaints about cleanliness.",
-    revenueUplift: "+4.8",
-    revenueDetail: "star average from cleaner reviews",
-    effort: "easy",
-    effortTime: "5 min per property",
-    category: "operations",
-    stage: "optimizing",
-    status: "todo",
-    icon: Shield,
-    actionLabel: "Configure Photos",
-    actionRoute: "/dashboard/properties",
-    priority: 7,
+    revenueUplift: "+4.8", revenueDetail: "star average from cleaner reviews",
+    effort: "easy", effortTime: "5 min per property", category: "operations",
+    stage: "optimizing", status: "todo", icon: Shield,
+    actionLabel: "Configure Photos", actionRoute: "/dashboard/properties", priority: 7,
   },
   // SCALING
   {
-    id: "r11",
-    title: "Enable advanced analytics",
+    id: "r11", title: "Enable advanced analytics",
     description: "Get detailed revenue reports, occupancy trends, and property comparisons. Data-driven managers grow their portfolios 2x faster.",
-    revenueUplift: "+40%",
-    revenueDetail: "faster portfolio growth",
-    effort: "hard",
-    effortTime: "Upgrade to Business",
-    category: "growth",
-    stage: "scaling",
-    status: "todo",
-    icon: BarChart3,
-    actionLabel: "Explore Analytics",
-    actionRoute: "/dashboard/settings",
-    priority: 8,
+    revenueUplift: "+40%", revenueDetail: "faster portfolio growth",
+    effort: "hard", effortTime: "Upgrade to Business", category: "growth",
+    stage: "scaling", status: "todo", icon: BarChart3,
+    actionLabel: "Explore Analytics", actionRoute: "/dashboard/settings", priority: 8,
   },
 ];
 
@@ -245,13 +156,8 @@ const effortConfig: Record<Effort, { label: string; color: string; bg: string }>
   hard: { label: "Project", color: "#A29BFE", bg: "#A29BFE15" },
 };
 
-const categoryLabels: Record<Category, string> = {
-  setup: "Setup",
-  channels: "Channels",
-  pricing: "Pricing",
-  operations: "Operations",
-  growth: "Growth",
-};
+const AUTO_COLLAPSE_THRESHOLD = 3;
+const LS_KEY = "oomsi_recs_collapsed";
 
 function getCurrentStage(recs: Recommendation[]): Stage {
   const gettingStartedDone = recs
@@ -286,13 +192,24 @@ export function Recommendations() {
   const [recommendations, setRecommendations] = useState(allRecommendations);
   const [showCompleted, setShowCompleted] = useState(false);
 
+  // Collapse state: initialize from localStorage, or auto-detect based on completions
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem(LS_KEY);
+      if (stored !== null) return stored === "true";
+    } catch {}
+    // Auto-collapse if user has already completed enough
+    const completedCount = allRecommendations.filter((r) => r.status === "completed").length;
+    return completedCount >= AUTO_COLLAPSE_THRESHOLD;
+  });
+
+  const completedRecs = recommendations.filter((r) => r.status === "completed");
   const currentStage = getCurrentStage(recommendations);
   const completionPercent = getCompletionPercent(recommendations);
 
   const activeRecs = recommendations
     .filter((r) => r.status !== "completed" && r.status !== "dismissed")
     .sort((a, b) => {
-      // Current stage first, then next stages
       const stageOrder = stages.map((s) => s.key);
       const aStageIdx = stageOrder.indexOf(a.stage);
       const bStageIdx = stageOrder.indexOf(b.stage);
@@ -300,7 +217,30 @@ export function Recommendations() {
       return a.priority - b.priority;
     });
 
-  const completedRecs = recommendations.filter((r) => r.status === "completed");
+  const topRecommendation = activeRecs[0];
+  const restRecommendations = activeRecs.slice(1, 5);
+
+  // Persist collapse state + auto-collapse when threshold reached
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, String(isCollapsed));
+    } catch {}
+  }, [isCollapsed]);
+
+  // Auto-collapse after completing enough items
+  useEffect(() => {
+    if (completedRecs.length >= AUTO_COLLAPSE_THRESHOLD && !isCollapsed) {
+      const stored = localStorage.getItem(LS_KEY);
+      // Only auto-collapse if user hasn't explicitly expanded it
+      if (stored === null) {
+        setIsCollapsed(true);
+      }
+    }
+  }, [completedRecs.length]);
+
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
 
   const handleComplete = (id: string) => {
     setRecommendations((prev) =>
@@ -314,9 +254,138 @@ export function Recommendations() {
     );
   };
 
-  const topRecommendation = activeRecs[0];
-  const restRecommendations = activeRecs.slice(1, 5); // Show next 4
+  /* ═══════════════════════════════════════════════
+     COLLAPSED VIEW — slim single-line bar
+     ═══════════════════════════════════════════════ */
+  if (isCollapsed) {
+    return (
+      <div className="mb-6">
+        <button
+          onClick={toggleCollapse}
+          className="w-full bg-white rounded-xl px-4 py-3 flex items-center gap-3 transition-all hover:shadow-md cursor-pointer group"
+          style={{ boxShadow: "0 1px 3px rgba(38,70,83,0.06)" }}
+        >
+          {/* Icon */}
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+            style={{ backgroundColor: C.periwinkle + "15" }}
+          >
+            <Lightbulb size={14} style={{ color: C.periwinkle }} />
+          </div>
 
+          {/* Progress bar (mini) */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2.5">
+              <span
+                style={{
+                  fontFamily: F.heading,
+                  fontSize: "0.8125rem",
+                  fontWeight: 700,
+                  color: C.teal,
+                }}
+              >
+                Unlock More Revenue
+              </span>
+              <span
+                style={{
+                  fontFamily: F.body,
+                  fontSize: "0.625rem",
+                  color: C.green,
+                  fontWeight: 600,
+                }}
+              >
+                {completionPercent}%
+              </span>
+              <div
+                className="flex-1 h-1 rounded-full max-w-[120px] hidden sm:block"
+                style={{ backgroundColor: C.green + "12" }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${completionPercent}%`,
+                    background: `linear-gradient(90deg, ${C.green}, ${C.periwinkle})`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Next recommendation teaser */}
+            {topRecommendation && (
+              <div className="flex items-center gap-2 mt-0.5">
+                <span
+                  style={{
+                    fontFamily: F.body,
+                    fontSize: "0.6875rem",
+                    color: C.slate,
+                    opacity: 0.4,
+                  }}
+                >
+                  Next:
+                </span>
+                <span
+                  className="truncate"
+                  style={{
+                    fontFamily: F.body,
+                    fontSize: "0.6875rem",
+                    color: C.slate,
+                    opacity: 0.6,
+                  }}
+                >
+                  {topRecommendation.title}
+                </span>
+                <span className="flex items-center gap-0.5 shrink-0">
+                  <TrendingUp size={10} style={{ color: "#16A34A" }} />
+                  <span
+                    style={{
+                      fontFamily: F.heading,
+                      fontSize: "0.6875rem",
+                      fontWeight: 700,
+                      color: "#16A34A",
+                    }}
+                  >
+                    {topRecommendation.revenueUplift}
+                  </span>
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Expand button */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {topRecommendation && (
+              <span
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-md"
+                style={{
+                  backgroundColor: C.green + "10",
+                  fontFamily: F.body,
+                  fontSize: "0.625rem",
+                  fontWeight: 600,
+                  color: C.green,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(topRecommendation.actionRoute);
+                }}
+              >
+                {topRecommendation.actionLabel}
+                <ArrowRight size={10} />
+              </span>
+            )}
+            <ChevronDown
+              size={14}
+              style={{ color: C.slate, opacity: 0.3 }}
+              className="group-hover:opacity-60 transition-opacity"
+            />
+          </div>
+        </button>
+      </div>
+    );
+  }
+
+  /* ═══════════════════════════════════════════════
+     EXPANDED VIEW — full recommendations engine
+     ═══════════════════════════════════════════════ */
   return (
     <div className="mb-6">
       {/* Section header */}
@@ -351,25 +420,40 @@ export function Recommendations() {
             </p>
           </div>
         </div>
-        {completedRecs.length > 0 && (
+        <div className="flex items-center gap-2">
+          {completedRecs.length > 0 && (
+            <button
+              onClick={() => setShowCompleted(!showCompleted)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              style={{
+                fontFamily: F.body,
+                fontSize: "0.6875rem",
+                color: C.green,
+                fontWeight: 500,
+              }}
+            >
+              {completedRecs.length} completed
+              <ChevronRight
+                size={11}
+                className="transition-transform"
+                style={{ transform: showCompleted ? "rotate(90deg)" : "none" }}
+              />
+            </button>
+          )}
           <button
-            onClick={() => setShowCompleted(!showCompleted)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={toggleCollapse}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            title="Minimize recommendations"
             style={{
               fontFamily: F.body,
               fontSize: "0.6875rem",
-              color: C.green,
-              fontWeight: 500,
+              color: C.slate,
+              opacity: 0.35,
             }}
           >
-            {completedRecs.length} completed
-            <ChevronRight
-              size={11}
-              className="transition-transform"
-              style={{ transform: showCompleted ? "rotate(90deg)" : "none" }}
-            />
+            <ChevronUp size={14} />
           </button>
-        )}
+        </div>
       </div>
 
       {/* Journey Progress */}
@@ -787,50 +871,47 @@ export function Recommendations() {
               COMPLETED
             </p>
           </div>
-          {completedRecs.map((rec, i) => {
-            const RecIcon = rec.icon;
-            return (
+          {completedRecs.map((rec, i) => (
+            <div
+              key={rec.id}
+              className="flex items-center gap-3 px-4 py-2.5"
+              style={{
+                borderBottom:
+                  i < completedRecs.length - 1
+                    ? "1px solid #F3F4F6"
+                    : "none",
+                opacity: 0.5,
+              }}
+            >
               <div
-                key={rec.id}
-                className="flex items-center gap-3 px-4 py-2.5"
+                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: C.green + "10" }}
+              >
+                <Check size={13} style={{ color: C.green }} />
+              </div>
+              <span
                 style={{
-                  borderBottom:
-                    i < completedRecs.length - 1
-                      ? "1px solid #F3F4F6"
-                      : "none",
-                  opacity: 0.5,
+                  fontFamily: F.body,
+                  fontSize: "0.75rem",
+                  color: C.slate,
+                  textDecoration: "line-through",
+                  flex: 1,
                 }}
               >
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: C.green + "10" }}
-                >
-                  <Check size={13} style={{ color: C.green }} />
-                </div>
-                <span
-                  style={{
-                    fontFamily: F.body,
-                    fontSize: "0.75rem",
-                    color: C.slate,
-                    textDecoration: "line-through",
-                    flex: 1,
-                  }}
-                >
-                  {rec.title}
-                </span>
-                <span
-                  style={{
-                    fontFamily: F.body,
-                    fontSize: "0.625rem",
-                    color: C.green,
-                    fontWeight: 500,
-                  }}
-                >
-                  {rec.revenueUplift}
-                </span>
-              </div>
-            );
-          })}
+                {rec.title}
+              </span>
+              <span
+                style={{
+                  fontFamily: F.body,
+                  fontSize: "0.625rem",
+                  color: C.green,
+                  fontWeight: 500,
+                }}
+              >
+                {rec.revenueUplift}
+              </span>
+            </div>
+          ))}
         </div>
       )}
 
@@ -871,4 +952,38 @@ export function Recommendations() {
       )}
     </div>
   );
+}
+
+/* ─── Export collapsed state for DashboardPage to read ─── */
+export function useRecommendationsCollapsed(): boolean {
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem(LS_KEY);
+      if (stored !== null) return stored === "true";
+    } catch {}
+    const completedCount = allRecommendations.filter((r) => r.status === "completed").length;
+    return completedCount >= AUTO_COLLAPSE_THRESHOLD;
+  });
+
+  useEffect(() => {
+    const handler = () => {
+      try {
+        setCollapsed(localStorage.getItem(LS_KEY) === "true");
+      } catch {}
+    };
+    window.addEventListener("storage", handler);
+    // Also poll for same-tab changes
+    const interval = setInterval(() => {
+      try {
+        const val = localStorage.getItem(LS_KEY) === "true";
+        setCollapsed((prev) => (prev !== val ? val : prev));
+      } catch {}
+    }, 300);
+    return () => {
+      window.removeEventListener("storage", handler);
+      clearInterval(interval);
+    };
+  }, []);
+
+  return collapsed;
 }

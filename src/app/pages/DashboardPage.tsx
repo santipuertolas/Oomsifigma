@@ -10,7 +10,7 @@ export function DashboardPage() {
     <>
       <WelcomeHeader />
 
-      {/* Recommendations — revenue growth engine */}
+      {/* Recommendations — collapsible, always at top */}
       <Recommendations />
 
       {/* Needs Assignment — urgent action items */}

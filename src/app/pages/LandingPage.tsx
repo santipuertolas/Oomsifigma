@@ -8,10 +8,10 @@ import {
   Mail, Send, MessageSquare,
   BarChart3, Clock, TrendingUp,
 } from "lucide-react";
-import howItWorksStep1 from "figma:asset/bb8e7085586ce16bf7aa9b47e1120469a9a60ec1.png";
-import howItWorksStep2 from "figma:asset/a8440c6907bc4ab2ffa8b3d49b213383406615a0.png";
-import howItWorksStep3 from "figma:asset/63d1dcb4dadbafb437854fc2c42657d18768320b.png";
-import howItWorksStep4 from "figma:asset/764beacfa6773665c2488e62145711850b220223.png";
+const howItWorksStep1 = "https://images.unsplash.com/photo-1532960546490-72765f9494c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2YWNhdGlvbiUyMHJlbnRhbCUyMHByb3BlcnR5JTIwbGlzdGluZyUyMGxhcHRvcHxlbnwxfHx8fDE3NzIzOTc0Njd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const howItWorksStep2 = "https://images.unsplash.com/photo-1719749582943-32b710dd5026?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29raW5nJTIwcGxhdGZvcm0lMjBpbnRlZ3JhdGlvbiUyMHRlY2hub2xvZ3klMjBzY3JlZW58ZW58MXx8fHwxNzcyMzk3NDY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const howItWorksStep3 = "https://images.unsplash.com/photo-1580842402762-6f5868c17412?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjbGVhbmluZyUyMHRlYW0lMjBjb29yZGluYXRpb24lMjBob3NwaXRhbGl0eXxlbnwxfHx8fDE3NzIzOTc0Njh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const howItWorksStep4 = "https://images.unsplash.com/photo-1724139564791-ffb1135d8c90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWxheGluZyUyMHZhY2F0aW9uJTIwcHJvcGVydHklMjBvd25lciUyMHBvb2xzaWRlfGVufDF8fHx8MTc3MjM5NzQ2OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
 /* ─── Brand Tokens ─── */
 const C = {
