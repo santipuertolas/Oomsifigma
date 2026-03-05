@@ -5,16 +5,16 @@ import {
   Plus, X, Sparkles, Building2, Bed, Bath,
   CheckCircle2, Link2,
 } from "lucide-react";
+import { C as B, F } from "../brand";
 
 const C = {
-  teal: "#264653",
-  green: "#2A9D8F",
-  periwinkle: "#A29BFE",
-  sand: "#E9C46A",
-  white: "#F8F9FA",
-  slate: "#2D3436",
+  teal: B.ink,
+  green: B.primaryDeep,
+  periwinkle: B.violet,
+  sand: B.border,
+  white: B.bg,
+  slate: B.text,
 };
-const F = { heading: "Nunito, sans-serif", body: "Inter, sans-serif" };
 
 const steps = [
   { icon: Home, label: "Add Property", number: 1 },
@@ -442,7 +442,7 @@ export function OnboardingPage() {
             </button>
 
             <p className="mt-4" style={{ fontFamily: F.body, fontSize: "0.6875rem", color: C.slate, opacity: 0.3 }}>
-              Your 14-day Professional trial has started
+              Your 14-day free trial has started
             </p>
           </div>
         )}

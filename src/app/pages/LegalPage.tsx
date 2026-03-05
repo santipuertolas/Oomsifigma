@@ -1,8 +1,8 @@
 import { useNavigate, useLocation } from "react-router";
 import { ArrowLeft } from "lucide-react";
 
-const C = { teal: "#264653", green: "#2A9D8F", white: "#F8F9FA", slate: "#2D3436" };
-const F = { heading: "Nunito, sans-serif", body: "Inter, sans-serif" };
+import { C as B, F } from "../brand";
+const C = { teal: B.ink, green: B.primaryDeep, white: B.bg, slate: B.text };
 
 const legalContent: Record<string, { title: string; lastUpdated: string; sections: { heading: string; body: string }[] }> = {
   "/privacy": {

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Check, Building2 } from "lucide-react";
+import { C as B, F } from "../brand";
 
 const C = {
-  teal: "#264653",
-  green: "#2A9D8F",
-  periwinkle: "#A29BFE",
-  sand: "#E9C46A",
-  white: "#F8F9FA",
-  slate: "#2D3436",
+  teal: B.ink,
+  green: B.primaryDeep,
+  periwinkle: B.violet,
+  sand: B.border,
+  white: B.bg,
+  slate: B.text,
 };
-const F = { heading: "Nunito, sans-serif", body: "Inter, sans-serif" };
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export function SignupPage() {
   };
 
   const benefits = [
-    "14-day free trial on Starter & Professional",
+    "14-day free trial — all features included",
     "No credit card required to start",
     "Set up in under 15 minutes",
     "Cancel anytime — no contracts",

@@ -508,22 +508,22 @@ function BillingSettings() {
               Current Plan
             </p>
             <p style={{ fontFamily: "Nunito, sans-serif", fontSize: "1.25rem", color: "#264653", fontWeight: 700 }}>
-              Professional
+              Oomsi Plan
             </p>
           </div>
           <div className="text-right">
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "1.25rem", color: "#264653", fontWeight: 600 }}>$49</p>
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#2D3436", opacity: 0.4 }}>/month</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "1.25rem", color: "#264653", fontWeight: 600 }}>$54</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.6875rem", color: "#2D3436", opacity: 0.4 }}>/month · 3 properties × $18/property</p>
           </div>
         </div>
         <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#2D3436", opacity: 0.5 }}>
-          Up to 15 properties - Unlimited team members - AI Concierge included
+          All features included · Unlimited team members · No feature limits
         </p>
         <button
           className="mt-3 px-4 py-1.5 rounded-lg transition-all hover:opacity-90"
           style={{ fontFamily: "Inter, sans-serif", fontSize: "0.75rem", color: "#2A9D8F", backgroundColor: "#2A9D8F15", fontWeight: 500 }}
         >
-          Upgrade Plan
+          Manage Plan
         </button>
       </div>
 
@@ -559,9 +559,9 @@ function BillingSettings() {
           Recent Invoices
         </h3>
         {[
-          { date: "Feb 1, 2026", amount: "$49.00", status: "Paid" },
-          { date: "Jan 1, 2026", amount: "$49.00", status: "Paid" },
-          { date: "Dec 1, 2025", amount: "$49.00", status: "Paid" },
+          { date: "Feb 1, 2026", amount: "$54.00", status: "Paid" },
+          { date: "Jan 1, 2026", amount: "$54.00", status: "Paid" },
+          { date: "Dec 1, 2025", amount: "$54.00", status: "Paid" },
         ].map((inv) => (
           <div key={inv.date} className="flex items-center justify-between py-3 border-b border-gray-50">
             <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.8125rem", color: "#2D3436", opacity: 0.6 }}>{inv.date}</span>
